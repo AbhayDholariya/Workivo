@@ -6,22 +6,25 @@ export default function MetricCard({ title, value, subtitle, icon: Icon, color =
     emerald: 'bg-emerald-50 text-emerald-600 border-emerald-100',
     amber: 'bg-amber-50 text-amber-600 border-amber-100',
     rose: 'bg-rose-50 text-rose-600 border-rose-100',
-    blue: 'bg-blue-50 text-blue-600 border-blue-100',
-    slate: 'bg-slate-50 text-slate-600 border-slate-100',
+    blue: 'bg-sky-50 text-sky-600 border-sky-100',
+    slate: 'bg-slate-100 text-slate-600 border-slate-200',
   };
 
-  const selectedColor = colorMap[color] || colorMap.indigo;
+  const colorClass = colorMap[color] || colorMap.indigo;
 
   return (
-    <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-200/80 hover:shadow transition-shadow">
+    <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs hover:shadow-md transition duration-200 group">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">{title}</p>
-          <p className="mt-2 text-3xl font-bold text-slate-900">{value ?? '0'}</p>
-          {subtitle && <p className="mt-1 text-xs text-slate-500">{subtitle}</p>}
+          <p className="text-xs font-bold uppercase tracking-wider text-slate-500">{title}</p>
+          <p className="mt-2 text-3xl font-extrabold text-slate-900 tracking-tight">
+            {value ?? '0'}
+          </p>
+          {subtitle && <p className="mt-1 text-xs text-slate-500 font-medium">{subtitle}</p>}
         </div>
+
         {Icon && (
-          <div className={`p-3 rounded-xl border ${selectedColor}`}>
+          <div className={`p-3.5 rounded-2xl border transition duration-200 group-hover:scale-105 ${colorClass}`}>
             <Icon className="w-6 h-6" />
           </div>
         )}

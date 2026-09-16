@@ -74,7 +74,6 @@ export default function EmployeesPage() {
   }, [search, department, statusFilter]);
 
   const handleOpenAdd = () => {
-    // Extract numbers from existing employee IDs starting with EMP-E
     const empNumbers = employees
       .map((e) => {
         const match = (e.employee_id || '').match(/EMP-E(\d+)/i);
@@ -113,21 +112,18 @@ export default function EmployeesPage() {
   const handleCreate = async (e) => {
     e.preventDefault();
 
-    // 1. Email format validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
       toast.error('Please enter a valid corporate email address (e.g. user@company.com).');
       return;
     }
 
-    // 2. Phone format validation
     const phoneCleaned = (formData.phone || '').replace(/[\s\-\(\)]/g, '');
     if (!phoneCleaned || !/^\+?[0-9]{10,15}$/.test(phoneCleaned)) {
       toast.error('Please enter a valid 10-digit mobile phone number.');
       return;
     }
 
-    // 3. Joining date validation
     if (!formData.joining_date) {
       toast.error('Please select a Joining Date.');
       return;
@@ -172,7 +168,6 @@ export default function EmployeesPage() {
   const handleUpdate = async (e) => {
     e.preventDefault();
 
-    // Phone format validation on update
     if (formData.phone) {
       const phoneCleaned = formData.phone.replace(/[\s\-\(\)]/g, '');
       if (!/^\+?[0-9]{10,15}$/.test(phoneCleaned)) {
@@ -208,7 +203,6 @@ export default function EmployeesPage() {
     }
   };
 
-  // Managers list for dropdown assignment
   const managersList = employees.filter((e) => e.role === 'MANAGER' || e.role === 'ADMIN');
 
   return (

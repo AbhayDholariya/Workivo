@@ -66,7 +66,6 @@ export default function AttendancePage() {
     }
   };
 
-  // CSV Export utility (optional feature)
   const exportToCSV = () => {
     if (!records.length) {
       toast.error('No records to export.');

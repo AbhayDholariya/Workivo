@@ -310,7 +310,9 @@ def seed():
         start_date=today + timedelta(days=5),
         end_date=today + timedelta(days=6),
         reason="Personal work at home",
-        status=LeaveRequest.Status.PENDING
+        status=LeaveRequest.Status.PENDING,
+        manager_approval=LeaveRequest.ApprovalStatus.PENDING,
+        admin_approval=LeaveRequest.ApprovalStatus.PENDING,
     )
 
     LeaveRequest.objects.create(
@@ -320,6 +322,8 @@ def seed():
         end_date=today + timedelta(days=11),
         reason="Medical checkup",
         status=LeaveRequest.Status.APPROVED,
+        manager_approval=LeaveRequest.ApprovalStatus.APPROVED,
+        admin_approval=LeaveRequest.ApprovalStatus.APPROVED,
         actioned_by=mgr_qa,
         actioned_at=timezone.now()
     )

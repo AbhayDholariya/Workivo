@@ -61,5 +61,28 @@ class LeaveRequest(models.Model):
     class Meta:
         ordering = ['-created_at']
 
+    def save(self, *args, **kwargs):
+        if self.user_id:
+            from accounts.models import User
+            try:
+                user_obj = getattr(self, 'user', None) or User.objects.get(pk=self.user_id)
+                if user_obj.role == User.Role.EMPLOYEE:
+                    if self.manager_approval == self.ApprovalStatus.APPROVED and self.admin_approval == self.ApprovalStatus.APPROVED:
+                        self.status = self.Status.APPROVED
+                    elif self.manager_approval == self.ApprovalStatus.REJECTED or self.admin_approval == self.ApprovalStatus.REJECTED:
+                        self.status = self.Status.REJECTED
+                    elif self.status != self.Status.CANCELLED:
+                        self.status = self.Status.PENDING
+                elif user_obj.role == User.Role.MANAGER:
+                    if self.admin_approval == self.ApprovalStatus.APPROVED:
+                        self.status = self.Status.APPROVED
+                    elif self.admin_approval == self.ApprovalStatus.REJECTED:
+                        self.status = self.Status.REJECTED
+                    elif self.status != self.Status.CANCELLED:
+                        self.status = self.Status.PENDING
+            except Exception:
+                pass
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"{self.user.email} [{self.leave_type}] {self.start_date} to {self.end_date} ({self.status})"

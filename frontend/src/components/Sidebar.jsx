@@ -11,7 +11,6 @@ import {
 
 export default function Sidebar() {
   const { user } = useAuth();
-  const isAdmin = user?.role === 'ADMIN';
 
   const navItems = [
     {
@@ -24,7 +23,7 @@ export default function Sidebar() {
       label: 'Employees',
       path: '/employees',
       icon: Users,
-      roles: ['ADMIN'], // Only HR/Admin can view all / manage
+      roles: ['ADMIN'],
     },
     {
       label: 'Attendance',
@@ -49,9 +48,9 @@ export default function Sidebar() {
   const filteredItems = navItems.filter((item) => item.roles.includes(user?.role));
 
   return (
-    <aside className="w-64 bg-white border-r border-slate-200/80 min-h-[calc(100vh-4rem)] p-4 flex flex-col justify-between">
+    <aside className="w-64 bg-white border-r border-slate-200 min-h-[calc(100vh-4rem)] p-4 flex flex-col justify-between hidden md:flex shadow-xs">
       <div className="space-y-1">
-        <div className="px-3 py-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+        <div className="px-3.5 py-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
           Main Navigation
         </div>
 
@@ -62,10 +61,10 @@ export default function Sidebar() {
               key={item.path}
               to={item.path}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                `flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition duration-150 ${
                   isActive
-                    ? 'bg-indigo-50 text-indigo-600 font-semibold shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                    ? 'bg-indigo-50 text-indigo-700 shadow-xs border-r-2 border-indigo-600'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                 }`
               }
             >
@@ -76,12 +75,18 @@ export default function Sidebar() {
         })}
       </div>
 
-      <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-        <p className="text-xs font-semibold text-slate-700">Workivo HRMS Portal</p>
-        <p className="text-[11px] text-slate-400 mt-0.5">Vibe Coder Practical Task</p>
-        <div className="mt-2 pt-2 border-t border-slate-200/60 flex items-center justify-between text-[11px] text-slate-500">
-          <span>Role: <strong>{user?.role}</strong></span>
-          <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+      <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+        <div className="flex items-center justify-between text-xs font-bold text-slate-900">
+          <span>Workivo HRMS</span>
+          <span className="flex h-2 w-2 relative">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          </span>
+        </div>
+        <p className="text-[11px] text-slate-500 mt-0.5">Enterprise Portal</p>
+        <div className="mt-2.5 pt-2 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-600 font-mono">
+          <span>Active Role:</span>
+          <span className="text-indigo-700 font-bold">{user?.role}</span>
         </div>
       </div>
     </aside>

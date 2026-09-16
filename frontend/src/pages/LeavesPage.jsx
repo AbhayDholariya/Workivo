@@ -174,7 +174,7 @@ export default function LeavesPage() {
               className={`px-4 py-2 text-xs font-semibold rounded-xl transition ${
                 activeTab === 'mine'
                   ? 'bg-indigo-600 text-white shadow-xs'
-                  : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                  : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200 shadow-xs'
               }`}
             >
               My Leave Requests
@@ -187,7 +187,7 @@ export default function LeavesPage() {
               className={`px-4 py-2 text-xs font-semibold rounded-xl transition ${
                 activeTab === 'team'
                   ? 'bg-indigo-600 text-white shadow-xs'
-                  : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                  : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200 shadow-xs'
               }`}
             >
               {role === 'ADMIN' ? 'All Company Leaves' : "Team Leave Requests"}
@@ -199,7 +199,7 @@ export default function LeavesPage() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-1.5 border border-slate-200 rounded-xl text-xs text-slate-600 focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white"
+            className="px-3.5 py-2 text-xs bg-white text-slate-700 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 cursor-pointer shadow-xs"
           >
             <option value="">All Statuses</option>
             <option value="PENDING">Pending</option>
@@ -217,13 +217,13 @@ export default function LeavesPage() {
             <div className="w-8 h-8 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
           </div>
         ) : leaves.length === 0 ? (
-          <div className="p-12 text-center text-slate-400 text-sm">
+          <div className="p-12 text-center text-slate-500 text-sm">
             No leave requests found in this view.
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-slate-600">
-              <thead className="bg-slate-50/80 text-xs uppercase font-semibold text-slate-500 border-b border-slate-100">
+            <table className="w-full text-left text-sm text-slate-700">
+              <thead className="bg-slate-50/80 text-xs uppercase tracking-wider font-semibold text-slate-500 border-b border-slate-200">
                 <tr>
                   <th className="px-6 py-3.5">Employee</th>
                   <th className="px-6 py-3.5">Leave Type</th>
@@ -241,48 +241,57 @@ export default function LeavesPage() {
                   const canAction = isManagerActionable || isAdminActionable;
 
                   return (
-                    <tr key={leave.id} className="hover:bg-slate-50/50 transition-colors">
+                    <tr key={leave.id} className="hover:bg-slate-50/80 transition">
                       <td className="px-6 py-4">
                         <p className="font-semibold text-slate-900">{leave.user?.full_name}</p>
-                        <p className="text-xs text-slate-400">{leave.user?.employee_id} • {leave.user?.department}</p>
+                        <p className="text-xs text-slate-500">{leave.user?.employee_id} • {leave.user?.department}</p>
                       </td>
                       <td className="px-6 py-4">
                         <StatusBadge status={leave.leave_type} />
                       </td>
                       <td className="px-6 py-4 text-xs">
                         <p className="font-semibold text-slate-800">{leave.start_date} → {leave.end_date}</p>
-                        <p className="text-slate-400 mt-0.5">{leave.duration_days} day(s)</p>
+                        <p className="text-slate-500 mt-0.5">{leave.duration_days} day(s)</p>
                       </td>
                       <td className="px-6 py-4 text-xs text-slate-600 max-w-xs">
-                        <p className="truncate">{leave.reason}</p>
+                        <p className="truncate text-slate-700">{leave.reason}</p>
                         {leave.rejection_reason && (
-                          <p className="text-rose-600 mt-1 italic">Rejection note: {leave.rejection_reason}</p>
+                          <p className="text-rose-600 mt-1 italic font-medium">Rejection note: {leave.rejection_reason}</p>
                         )}
                       </td>
                       <td className="px-6 py-4">
                         <StatusBadge status={leave.status} />
-                        <p className="text-[11px] font-medium text-slate-600 mt-1">
+                        <p className="text-[11px] font-medium text-slate-500 mt-1.5">
                           {leave.approval_display_text}
                         </p>
-                        <div className="flex gap-1.5 mt-1">
-                          <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono border ${
+                        
+                        {/* Dual Approval Stepper Pipeline */}
+                        <div className="flex items-center gap-1.5 mt-2 flex-wrap sm:flex-nowrap">
+                          {/* Step 1: Manager */}
+                          <div className={`inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg font-medium border whitespace-nowrap ${
                             leave.manager_approval === 'APPROVED' 
                               ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
                               : leave.manager_approval === 'REJECTED' 
                               ? 'bg-rose-50 text-rose-700 border-rose-200' 
                               : 'bg-amber-50 text-amber-700 border-amber-200'
                           }`}>
-                            Mgr: {leave.manager_approval}
-                          </span>
-                          <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono border ${
+                            <span className="font-semibold">Manager:</span>
+                            <span>{leave.manager_approval}</span>
+                          </div>
+
+                          <span className="text-slate-400 text-xs font-bold shrink-0">→</span>
+
+                          {/* Step 2: HR */}
+                          <div className={`inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg font-medium border whitespace-nowrap ${
                             leave.admin_approval === 'APPROVED' 
                               ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
                               : leave.admin_approval === 'REJECTED' 
                               ? 'bg-rose-50 text-rose-700 border-rose-200' 
                               : 'bg-amber-50 text-amber-700 border-amber-200'
                           }`}>
-                            HR: {leave.admin_approval}
-                          </span>
+                            <span className="font-semibold">HR/Admin:</span>
+                            <span>{leave.admin_approval}</span>
+                          </div>
                         </div>
                       </td>
                       <td className="px-6 py-4 text-right space-x-2">
@@ -291,14 +300,14 @@ export default function LeavesPage() {
                             <button
                               onClick={() => handleApprove(leave.id)}
                               disabled={actionLoading}
-                              className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow-xs disabled:opacity-50"
+                              className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow-xs transition disabled:opacity-50"
                             >
                               Approve
                             </button>
                             <button
                               onClick={() => openRejectModal(leave.id)}
                               disabled={actionLoading}
-                              className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg text-xs font-semibold disabled:opacity-50"
+                              className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg text-xs font-semibold transition disabled:opacity-50"
                             >
                               Reject
                             </button>
@@ -308,7 +317,7 @@ export default function LeavesPage() {
                         {isOwner && leave.status === 'PENDING' && (
                           <button
                             onClick={() => handleCancel(leave.id)}
-                            className="px-3 py-1.5 text-xs font-semibold text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg border border-slate-200"
+                            className="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:text-rose-600 hover:bg-rose-50 rounded-lg border border-slate-200 transition"
                             title="Cancel Leave Application"
                           >
                             Cancel
@@ -333,11 +342,11 @@ export default function LeavesPage() {
       >
         <form onSubmit={handleApply} className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">Leave Type *</label>
+            <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Leave Type *</label>
             <select
               value={formData.leave_type}
               onChange={(e) => setFormData({ ...formData, leave_type: e.target.value })}
-              className="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              className="w-full p-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 shadow-xs"
             >
               <option value="CASUAL">Casual Leave</option>
               <option value="SICK">Sick Leave</option>
@@ -348,36 +357,36 @@ export default function LeavesPage() {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">Start Date *</label>
+              <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Start Date *</label>
               <input
                 type="date"
                 required
                 value={formData.start_date}
                 onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
-                className="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                className="w-full p-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 shadow-xs"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">End Date *</label>
+              <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">End Date *</label>
               <input
                 type="date"
                 required
                 value={formData.end_date}
                 onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
-                className="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                className="w-full p-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 shadow-xs"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">Reason for Absence *</label>
+            <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Reason for Absence *</label>
             <textarea
               rows={3}
               required
               value={formData.reason}
               onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
               placeholder="State clear purpose of leave..."
-              className="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              className="w-full p-3 bg-white text-slate-900 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 shadow-xs"
             />
           </div>
 
@@ -385,14 +394,14 @@ export default function LeavesPage() {
             <button
               type="button"
               onClick={() => setApplyModalOpen(false)}
-              className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl"
+              className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 border border-slate-200 rounded-xl transition"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={actionLoading}
-              className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl shadow-xs disabled:opacity-50"
+              className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl shadow-xs transition disabled:opacity-50"
             >
               Submit Application
             </button>
@@ -411,26 +420,26 @@ export default function LeavesPage() {
             Please enter a formal rejection reason (mandatory as per company policy).
           </p>
           <div>
-            <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">Rejection Reason *</label>
+            <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Rejection Reason *</label>
             <textarea
               rows={3}
               value={rejectionReason}
               onChange={(e) => setRejectionReason(e.target.value)}
               placeholder="Reason for rejecting leave..."
-              className="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-rose-500 focus:outline-none"
+              className="w-full p-3 bg-white text-slate-900 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 shadow-xs"
             />
           </div>
-          <div className="flex justify-end gap-2 pt-2">
+          <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
             <button
               onClick={() => setRejectModalOpen(false)}
-              className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl"
+              className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 border border-slate-200 rounded-xl transition"
             >
               Cancel
             </button>
             <button
               onClick={handleConfirmReject}
               disabled={actionLoading || !rejectionReason.trim()}
-              className="px-4 py-2 bg-rose-600 hover:bg-rose-700 disabled:opacity-50 text-white text-xs font-semibold rounded-xl shadow-xs"
+              className="px-4 py-2 bg-rose-600 hover:bg-rose-700 disabled:opacity-50 text-white text-xs font-semibold rounded-xl shadow-xs transition"
             >
               Confirm Rejection
             </button>

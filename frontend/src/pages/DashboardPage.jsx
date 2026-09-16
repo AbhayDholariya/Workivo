@@ -17,7 +17,12 @@ import {
   LogOut,
   CalendarCheck,
   Send,
-  XCircle
+  XCircle,
+  Building2,
+  Activity,
+  PlusCircle,
+  ShieldCheck,
+  Sparkles
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -26,11 +31,17 @@ export default function DashboardPage() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
 
   // Reject modal state
   const [rejectModalOpen, setRejectModalOpen] = useState(false);
   const [selectedLeaveId, setSelectedLeaveId] = useState(null);
   const [rejectionReason, setRejectionReason] = useState('');
+
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   const fetchDashboardData = async () => {
     try {
@@ -122,10 +133,14 @@ export default function DashboardPage() {
   const role = user?.role;
   const stats = data?.stats || {};
 
+  const totalEmpCount = stats.totalEmployees || 1;
+  const presentPct = Math.round(((stats.presentToday || 0) / totalEmpCount) * 100);
+  const onLeavePct = Math.round(((stats.onLeaveToday || 0) / totalEmpCount) * 100);
+
   return (
     <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      {/* Header Banner */}
+      <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
             Dashboard Overview
@@ -134,8 +149,9 @@ export default function DashboardPage() {
             Welcome back, <strong className="text-slate-800">{user?.full_name || user?.email}</strong>. Here is today's summary.
           </p>
         </div>
-        <div className="text-xs text-slate-500 bg-white px-3 py-1.5 rounded-xl border border-slate-200 shadow-xs self-start sm:self-auto">
-          Today: <strong>{new Date().toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}</strong>
+        <div className="text-xs text-slate-700 bg-slate-50 px-3.5 py-2 rounded-xl border border-slate-200 shadow-xs self-start sm:self-auto flex items-center gap-2 font-mono">
+          <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span>Today: <strong>{currentTime.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}</strong> • {currentTime.toLocaleTimeString()}</span>
         </div>
       </div>
 
@@ -201,16 +217,16 @@ export default function DashboardPage() {
                 <table className="w-full text-left text-sm text-slate-600">
                   <thead className="bg-slate-50/80 text-xs uppercase font-semibold text-slate-500 border-b border-slate-100">
                     <tr>
-                      <th className="px-6 py-3">Employee</th>
-                      <th className="px-6 py-3">Type</th>
-                      <th className="px-6 py-3">Duration</th>
-                      <th className="px-6 py-3">Reason</th>
-                      <th className="px-6 py-3 text-right">Actions</th>
+                      <th className="px-6 py-3.5">Employee</th>
+                      <th className="px-6 py-3.5">Type</th>
+                      <th className="px-6 py-3.5">Duration</th>
+                      <th className="px-6 py-3.5">Reason</th>
+                      <th className="px-6 py-3.5 text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
                     {data?.recentLeaves?.map((req) => (
-                      <tr key={req.id} className="hover:bg-slate-50/50">
+                      <tr key={req.id} className="hover:bg-slate-50/50 transition">
                         <td className="px-6 py-3.5">
                           <p className="font-semibold text-slate-900">{req.user?.full_name}</p>
                           <p className="text-xs text-slate-400">{req.user?.employee_id} • {req.user?.department}</p>
@@ -314,16 +330,16 @@ export default function DashboardPage() {
                 <table className="w-full text-left text-sm text-slate-600">
                   <thead className="bg-slate-50/80 text-xs uppercase font-semibold text-slate-500 border-b border-slate-100">
                     <tr>
-                      <th className="px-6 py-3">Team Member</th>
-                      <th className="px-6 py-3">Type</th>
-                      <th className="px-6 py-3">Dates</th>
-                      <th className="px-6 py-3">Reason</th>
-                      <th className="px-6 py-3 text-right">Action</th>
+                      <th className="px-6 py-3.5">Team Member</th>
+                      <th className="px-6 py-3.5">Type</th>
+                      <th className="px-6 py-3.5">Dates</th>
+                      <th className="px-6 py-3.5">Reason</th>
+                      <th className="px-6 py-3.5 text-right">Action</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
                     {data?.recentRequests?.map((req) => (
-                      <tr key={req.id} className="hover:bg-slate-50/50">
+                      <tr key={req.id} className="hover:bg-slate-50/50 transition">
                         <td className="px-6 py-3.5">
                           <p className="font-semibold text-slate-900">{req.user?.full_name}</p>
                           <p className="text-xs text-slate-400">{req.user?.employee_id}</p>
@@ -471,16 +487,16 @@ export default function DashboardPage() {
                 <table className="w-full text-left text-sm text-slate-600">
                   <thead className="bg-slate-50/80 text-xs uppercase font-semibold text-slate-500 border-b border-slate-100">
                     <tr>
-                      <th className="px-6 py-3">Date</th>
-                      <th className="px-6 py-3">Check In</th>
-                      <th className="px-6 py-3">Check Out</th>
-                      <th className="px-6 py-3">Total Hours</th>
-                      <th className="px-6 py-3">Status</th>
+                      <th className="px-6 py-3.5">Date</th>
+                      <th className="px-6 py-3.5">Check In</th>
+                      <th className="px-6 py-3.5">Check Out</th>
+                      <th className="px-6 py-3.5">Total Hours</th>
+                      <th className="px-6 py-3.5">Status</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
                     {data?.recentAttendance?.map((att) => (
-                      <tr key={att.id} className="hover:bg-slate-50/50">
+                      <tr key={att.id} className="hover:bg-slate-50/50 transition">
                         <td className="px-6 py-3.5 font-medium text-slate-800">{att.date}</td>
                         <td className="px-6 py-3.5 text-xs text-slate-600">
                           {att.check_in ? new Date(att.check_in).toLocaleTimeString() : '—'}
@@ -515,7 +531,7 @@ export default function DashboardPage() {
             Please provide a specific rejection reason for this employee request (mandatory as per company policy).
           </p>
           <div>
-            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
               Rejection Reason *
             </label>
             <textarea
@@ -526,17 +542,17 @@ export default function DashboardPage() {
               className="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-rose-500 focus:outline-none"
             />
           </div>
-          <div className="flex justify-end gap-2 pt-2">
+          <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
             <button
               onClick={() => setRejectModalOpen(false)}
-              className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl"
+              className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition"
             >
               Cancel
             </button>
             <button
               onClick={handleConfirmReject}
               disabled={actionLoading || !rejectionReason.trim()}
-              className="px-4 py-2 bg-rose-600 hover:bg-rose-700 disabled:opacity-50 text-white text-xs font-semibold rounded-xl shadow-xs"
+              className="px-4 py-2 bg-rose-600 hover:bg-rose-700 disabled:opacity-50 text-white text-xs font-semibold rounded-xl shadow-xs transition"
             >
               Confirm Rejection
             </button>
