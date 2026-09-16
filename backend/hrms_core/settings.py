@@ -68,8 +68,9 @@ TEMPLATES = [
 WSGI_APPLICATION = 'hrms_core.wsgi.application'
 
 # Database Configuration
-# Supports PostgreSQL with fallback to SQLite
+# Supports PostgreSQL with fallback to writable /tmp SQLite on Vercel
 USE_POSTGRES = os.getenv('USE_POSTGRES', 'False').lower() in ('true', '1', 't')
+IS_VERCEL = 'VERCEL' in os.environ or os.getenv('VERCEL') == '1'
 
 if USE_POSTGRES:
     DATABASES = {
@@ -80,6 +81,21 @@ if USE_POSTGRES:
             'PASSWORD': os.getenv('DB_PASSWORD', 'postgres'),
             'HOST': os.getenv('DB_HOST', 'localhost'),
             'PORT': os.getenv('DB_PORT', '5432'),
+        }
+    }
+elif IS_VERCEL:
+    import shutil
+    writable_db = Path('/tmp/db.sqlite3')
+    original_db = BASE_DIR / 'db.sqlite3'
+    if not writable_db.exists() and original_db.exists():
+        try:
+            shutil.copy2(original_db, writable_db)
+        except Exception:
+            pass
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': writable_db if writable_db.exists() else original_db,
         }
     }
 else:
