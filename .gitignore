@@ -5,7 +5,6 @@ __pycache__/
 venv/
 env/
 .env
-*.sqlite3
 
 # Node / Vite
 node_modules/
