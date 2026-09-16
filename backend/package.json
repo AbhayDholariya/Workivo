@@ -1,0 +1,7 @@
+{
+  "name": "workivo-backend",
+  "private": true,
+  "scripts": {
+    "build": "echo 'Backend ready'"
+  }
+}
