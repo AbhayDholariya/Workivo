@@ -82,10 +82,21 @@ export default function LeavesPage() {
       setFormData(initialForm);
       fetchLeaves();
     } catch (err) {
-      const msg = err.response?.data?.detail || 
-                  err.response?.data?.non_field_errors?.[0] || 
-                  err.response?.data?.end_date?.[0] || 
-                  'Failed to apply for leave.';
+      const data = err.response?.data;
+      let msg = 'Failed to apply for leave.';
+      if (data) {
+        if (typeof data === 'string') msg = data;
+        else if (data.detail) msg = data.detail;
+        else if (data.error) msg = data.error;
+        else if (data.non_field_errors?.[0]) msg = data.non_field_errors[0];
+        else {
+          const firstKey = Object.keys(data)[0];
+          if (firstKey) {
+            const val = data[firstKey];
+            msg = Array.isArray(val) ? `${firstKey}: ${val[0]}` : String(val);
+          }
+        }
+      }
       toast.error(msg);
     } finally {
       setActionLoading(false);

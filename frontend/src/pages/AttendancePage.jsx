@@ -47,7 +47,16 @@ export default function AttendancePage() {
       toast.success(res.message || 'Checked in successfully!');
       fetchAttendance();
     } catch (err) {
-      toast.error(err.response?.data?.detail || 'Check-in failed.');
+      const data = err.response?.data;
+      let msg = 'Check-in failed.';
+      if (data) {
+        if (typeof data === 'string') msg = data;
+        else if (data.detail) msg = data.detail;
+        else if (data.error) msg = data.error;
+        else if (data.message) msg = data.message;
+        else if (data.non_field_errors?.[0]) msg = data.non_field_errors[0];
+      }
+      toast.error(msg);
     } finally {
       setActionLoading(false);
     }
@@ -60,7 +69,16 @@ export default function AttendancePage() {
       toast.success(res.message || 'Checked out successfully!');
       fetchAttendance();
     } catch (err) {
-      toast.error(err.response?.data?.detail || 'Check-out failed.');
+      const data = err.response?.data;
+      let msg = 'Check-out failed.';
+      if (data) {
+        if (typeof data === 'string') msg = data;
+        else if (data.detail) msg = data.detail;
+        else if (data.error) msg = data.error;
+        else if (data.message) msg = data.message;
+        else if (data.non_field_errors?.[0]) msg = data.non_field_errors[0];
+      }
+      toast.error(msg);
     } finally {
       setActionLoading(false);
     }

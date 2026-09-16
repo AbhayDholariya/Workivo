@@ -26,7 +26,7 @@ export default function ProtectedRoute({ allowedRoles }) {
     return (
       <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900">
         <Navbar />
-        <div className="flex flex-1 max-w-7xl w-full mx-auto">
+        <div className="flex flex-1 w-full">
           <Sidebar />
           <main className="flex-1 p-8 flex items-center justify-center">
             <div className="max-w-md w-full bg-white p-8 rounded-2xl border border-slate-200 text-center shadow-md">
@@ -53,7 +53,7 @@ export default function ProtectedRoute({ allowedRoles }) {
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900">
       <Navbar />
-      <div className="flex flex-1 max-w-7xl w-full mx-auto">
+      <div className="flex flex-1 w-full">
         <Sidebar />
         <main className="flex-1 p-4 md:p-8 overflow-y-auto">
           <Outlet />
