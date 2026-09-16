@@ -1,225 +1,277 @@
-# Workivo — Human Resource Management System
+# 🏢 Workivo — Enterprise Human Resource Management System (HRMS)
 
-A production-grade, full-stack HRMS developed for a small SaaS company adhering to all specifications and evaluation criteria in the **AppTrait Solutions Practical Assessment: Vibe Coder**.
+[![React 19](https://img.shields.io/badge/Frontend-React_19-blue?logo=react)](https://react.dev/)
+[![Vite 8](https://img.shields.io/badge/Build_Tool-Vite_8-646CFF?logo=vite)](https://vitejs.dev/)
+[![Django 5.1](https://img.shields.io/badge/Backend-Django_5.1-092E20?logo=django)](https://www.djangoproject.com/)
+[![Django REST Framework](https://img.shields.io/badge/API-DRF_3.15-red?logo=django)](https://www.django-rest-framework.org/)
+[![Tailwind CSS 3](https://img.shields.io/badge/Styling-Tailwind_CSS_3-38BDF8?logo=tailwindcss)](https://tailwindcss.com/)
+[![Vercel Deployment](https://img.shields.io/badge/Deploy-Vercel_Ready-000000?logo=vercel)](https://vercel.com)
+
+A state-of-the-art, clean, high-contrast **Human Resource Management System (HRMS)** designed for enterprise workforce management. Built with a modern **React 19** frontend and **Django REST Framework** backend, Workivo features automated employee ID sequencing (`EMP-E{xx}`), multi-stage dual leave approvals, real-time attendance tracking, dynamic KPI metrics, and strict role-based access control (RBAC).
 
 ---
 
 ## 📋 Table of Contents
-1. [Project Overview](#-project-overview)
-2. [Demo Credentials](#-demo-credentials)
-3. [Technology Stack](#-technology-stack)
-4. [System Architecture & Folder Structure](#-system-architecture--folder-structure)
-5. [Core Features & Permission Matrix](#-core-features--permission-matrix)
-6. [Defensive Business Logic & Edge Cases](#-defensive-business-logic--edge-cases)
-7. [Installation & Setup Guide](#-installation--setup-guide)
-8. [AI Development Process & Code Review](#-ai-development-process--code-review)
-9. [Known Limitations & Future Roadmap](#-known-limitations--future-roadmap)
+
+1. [✨ Key Features](#-key-features)
+2. [🔑 Demo Credentials & Organizational Structure](#-demo-credentials--organizational-structure)
+3. [🛠️ Technology Stack](#-technology-stack)
+4. [📁 System Architecture](#-system-architecture)
+5. [🛡️ Defensive Business Logic & Edge Cases](#-defensive-business-logic--edge-cases)
+6. [📡 API Documentation Reference](#-api-documentation-reference)
+7. [💻 Local Installation & Setup](#-local-installation--setup)
+8. [🌐 Vercel Deployment Guide](#-vercel-deployment-guide)
+9. [🗺️ Complete Product Roadmap](#-complete-product-roadmap)
 
 ---
 
-## 🚀 Project Overview
+## ✨ Key Features
 
-Workivo is designed to manage employee lifecycles, attendance tracking (check-in/check-out with duration calculations), multi-stage leave approvals, and role-specific analytics dashboards for three user tiers:
-- **HR / Admin**: Complete organizational oversight, employee creation, deactivation, and global leave/attendance controls.
-- **Manager**: Team-scoped oversight, team attendance monitoring, and team leave approvals/rejections with mandatory reasons.
-- **Employee**: Self-service portal for punching in/out, viewing personal attendance timeline, applying for leaves, and profile management.
+- 🎨 **Clean White & Light Design System**: High-contrast, executive-ready UI (`bg-slate-50`, `bg-white`, `border-slate-200`) with custom typography, soft status pills, and responsive side navigation.
+- 🆔 **Auto-Sequenced Employee IDs**:
+  - `EMP-A01` for HR / Admin
+  - `EMP-M01` through `EMP-M06` for Department Managers
+  - `EMP-E01` through `EMP-E08` auto-incrementing for newly created employees.
+- 🏢 **Pre-Seeded Department Hierarchy**:
+  1. **Anil Ahluwalia** (`EMP-M01`) — *Software Development*
+  2. **Ankit Aggarwal** (`EMP-M02`) — *QA Testing*
+  3. **Balfour Manuel** (`EMP-M03`) — *CyberSecurity*
+  4. **Harsh Patel** (`EMP-M04`) — *UI/UX Designer*
+  5. **Sarah Connor** (`EMP-M05`) — *Sales & Marketing*
+  6. **Alex Ferguson** (`EMP-M06`) — *Technical Support*
+- ⏳ **Dual-Level Leave Approval Pipeline**:
+  - Employee leave requests require **BOTH** Manager and HR/Admin approval before status becomes `APPROVED`.
+  - Live approval pipeline tracking (`Manager: APPROVED → HR/Admin: PENDING`).
+  - Manager leave requests require HR/Admin approval.
+  - HR/Admin users cannot submit self-leave applications.
+- ⏱️ **Real-Time Attendance Clock**: Instant check-in/check-out with duration calculations, duplicate check-in prevention, and approved leave conflict blocking.
+- 📊 **Workforce Analytics**: Dashboard KPI cards for total employees, attendance rates, leave entitlement quotas, and department headcounts.
 
 ---
 
-## 🔑 Demo Credentials
+## 🔑 Demo Credentials & Organizational Structure
 
-The database is pre-seeded with realistic organizational data across two distinct departments (Engineering & Sales) to verify team isolation:
+The application comes pre-seeded with 15 realistic user accounts across 6 company departments:
 
-| Role | Email | Password | Scope & Notes |
-| :--- | :--- | :--- | :--- |
-| **HR / Admin** | `admin@company.com` | `Admin@123` | Full access (All employees, attendance, leaves, metrics) |
-| **Manager (Eng)** | `manager@company.com` | `Manager@123` | Manages John Doe (`EMP-004`) and Jane Smith (`EMP-005`) |
-| **Employee (Eng)**| `employee@company.com` | `Employee@123` | Senior Engineer (John Doe) reporting to Alex Rivera |
-| **Manager (Sales)**| `sales.manager@company.com` | `Manager@123` | Manages David Kim (`EMP-006`) — tests team boundary checks |
-| **Deactivated User**| `inactive.emp@company.com`| `Employee@123` | Inactive status (tests login block edge case) |
+### 1. HR / Admin Access
+| Role | Name | Employee ID | Department | Corporate Email | Login Password |
+| :--- | :--- | :---: | :--- | :--- | :--- |
+| **HR / Admin** | Admin User | `EMP-A01` | Human Resources | `admin@company.com` | `Admin@123` |
 
-> 💡 **Tip**: The login page includes a **One-Click Demo Credentials** bar to quickly fill and switch accounts without typing!
+### 2. Department Managers (6 Accounts)
+| Role | Name | Employee ID | Department Managed | Corporate Email | Login Password |
+| :--- | :--- | :---: | :--- | :--- | :--- |
+| **Manager** | Anil Ahluwalia | `EMP-M01` | Software Development | `anil@company.com` | `Manager@123` |
+| **Manager** | Ankit Aggarwal | `EMP-M02` | QA Testing | `ankit@company.com` | `Manager@123` |
+| **Manager** | Balfour Manuel | `EMP-M03` | CyberSecurity | `balfour@company.com` | `Manager@123` |
+| **Manager** | Harsh Patel | `EMP-M04` | UI/UX Designer | `harsh@company.com` | `Manager@123` |
+| **Manager** | Sarah Connor | `EMP-M05` | Sales & Marketing | `sarah@company.com` | `Manager@123` |
+| **Manager** | Alex Ferguson | `EMP-M06` | Technical Support | `alex@company.com` | `Manager@123` |
+
+### 3. Employees Across Departments (8 Accounts)
+| Role | Name | Employee ID | Department | Reporting Manager | Corporate Email | Login Password |
+| :--- | :--- | :---: | :--- | :--- | :--- | :--- |
+| **Employee** | John Doe | `EMP-E01` | Software Development | Anil Ahluwalia (`EMP-M01`) | `employee@company.com` | `Employee@123` |
+| **Employee** | Rohan Sharma | `EMP-E02` | Software Development | Anil Ahluwalia (`EMP-M01`) | `rohan@company.com` | `Employee@123` |
+| **Employee** | Jane Smith | `EMP-E03` | QA Testing | Ankit Aggarwal (`EMP-M02`) | `jane@company.com` | `Employee@123` |
+| **Employee** | Priya Verma | `EMP-E04` | QA Testing | Ankit Aggarwal (`EMP-M02`) | `priya@company.com` | `Employee@123` |
+| **Employee** | Amit Kumar | `EMP-E05` | CyberSecurity | Balfour Manuel (`EMP-M03`) | `amit@company.com` | `Employee@123` |
+| **Employee** | Neha Gupta | `EMP-E06` | UI/UX Designer | Harsh Patel (`EMP-M04`) | `neha@company.com` | `Employee@123` |
+| **Employee** | David Kim | `EMP-E07` | Sales & Marketing | Sarah Connor (`EMP-M05`) | `sales.emp@company.com` | `Employee@123` |
+| **Employee** | Vikram Singh | `EMP-E08` | Technical Support | Alex Ferguson (`EMP-M06`) | `vikram@company.com` | `Employee@123` |
 
 ---
 
 ## 🛠️ Technology Stack
 
-- **Frontend**: **React.js 19 (Pure JavaScript)** built with **Vite 8**, **Tailwind CSS 3**, **React Router v7**, and **Lucide React**.
-- **Backend**: **Python 3.13 + Django 5.1 + Django REST Framework (DRF)**.
-- **Authentication**: **Stateless JWT Tokens** (`djangorestframework-simplejwt`) with **BCrypt password hashing**.
-- **Database**: **PostgreSQL** via Django's native ORM (`psycopg2-binary`) with automated fallback to SQLite for zero-friction local testing.
-- **Notifications**: **React Hot Toast**.
+- **Frontend**: React.js 19 (Pure JavaScript), Vite 8, Tailwind CSS 3, React Router v7, Lucide React icons, React Hot Toast.
+- **Backend**: Python 3.13, Django 5.1, Django REST Framework (DRF), SimpleJWT, WhiteNoise static files, Gunicorn.
+- **Database**: SQLite (default zero-config local dev) / PostgreSQL (`psycopg2-binary`).
+- **Deployment**: Vercel ready (Root `vercel.json` monorepo configuration).
 
 ---
 
-## 📁 System Architecture & Folder Structure
+## 📁 System Architecture
 
 ```
 HRMS/
-├── backend/                      # Python + Django + DRF API
-│   ├── manage.py
-│   ├── requirements.txt          # Python dependencies
-│   ├── tests_edge_cases.py       # Automated unit test suite verifying all 11 edge cases
-│   ├── seed_data.py              # Realistic demo seeder
-│   ├── hrms_core/                # Django core settings, JWT & global URL routing
-│   ├── accounts/                 # Custom User model, BCrypt auth, RBAC permissions
-│   ├── employees/                # Employee CRUD, Search, Filter, Deactivate
-│   ├── attendance/               # Daily check-in/out, hours computation, history
-│   ├── leaves/                   # Leave requests, boundary checks, manager approvals
-│   └── dashboard/                # Real-time database KPI aggregates
+├── vercel.json                   # Vercel Monorepo Serverless & Static Build Config
+├── backend/                      # Django 5.1 REST API
+│   ├── api/
+│   │   └── index.py              # Vercel Serverless Function WSGI adapter
+│   ├── hrms_core/                # Settings, URL Routing & JWT Configuration
+│   ├── accounts/                 # Custom User Model & RBAC Permissions
+│   ├── employees/                # Employee Directory & Auto-ID Generator
+│   ├── attendance/               # Attendance Check-in/out Logic & Timeline
+│   ├── leaves/                   # Dual Approval Workflow & Overlap Guards
+│   ├── dashboard/                # Aggregate KPI Analytics & Department Breakdown
+│   ├── seed_data.py              # Automated Database Seeder
+│   ├── tests_edge_cases.py       # Automated 9-Point Edge Case Test Suite
+│   └── requirements.txt          # Python Production Dependencies
 │
-├── frontend/                     # React.js (JavaScript) SPA
-│   ├── index.html
-│   ├── vite.config.js
-│   ├── tailwind.config.js
-│   └── src/
-│       ├── api/                  # Axios HTTP client with JWT interceptors
-│       ├── context/              # AuthContext (user, role, session management)
-│       ├── components/           # Navbar, Sidebar, ProtectedRoute, MetricCard, Modal, StatusBadge
-│       └── pages/                # Login, Dashboard, Employees, Attendance, Leaves, Profile
-│
-├── docs/                         # Assessment Specific Documentation
-│   ├── PLANNING.md               # Requirement analysis, application flows & DB design
-│   └── AI_DEVELOPMENT_REPORT.md  # 5 AI Prompts + 2 AI Code Review Challenges
-│
-└── README.md                     # Main documentation & setup guide
+└── frontend/                     # React 19 + Vite Web Application
+    ├── vercel.json               # SPA Client Routing Rewrites
+    ├── vite.config.js
+    ├── tailwind.config.js
+    └── src/
+        ├── api/                  # Axios Client with Bearer Token Interceptors
+        ├── context/              # AuthContext Session State
+        ├── components/           # Navbar, Sidebar, MetricCard, StatusBadge, Modal
+        └── pages/                # Login, Dashboard, Employees, Attendance, Leaves, Profile
 ```
 
 ---
 
-## 🛡️ Core Features & Permission Matrix
+## 🛡️ Defensive Business Logic & Edge Cases
 
-| Feature | Admin / HR | Manager | Employee | Security Enforcement Rule |
-| :--- | :---: | :---: | :---: | :--- |
-| **View All Employees** | Yes | No | No | Returns 403 Forbidden for Manager/Employee. |
-| **Add Employee** | Yes | No | No | Restricted to `ADMIN`. Generates unique `EMP-XXX`. |
-| **Edit Employee** | Yes | No | Own Profile | Employee can only edit personal phone/name; sensitive fields locked. |
-| **View Team Employees** | Yes | Yes | No | Manager query scoped strictly to `user.manager == current_user`. |
-| **Activate / Deactivate**| Yes | No | No | Inactive accounts are immediately rejected at login. |
-| **Mark Attendance** | Optional | Optional | Yes | User ID extracted strictly from verified JWT claims. |
-| **View Attendance** | All | Team Only | Own Only | Backend queryset filter prevents unauthorized data leakage. |
-| **Apply Leave** | Yes | Yes | Yes | Validated for date order, overlapping intervals, and attendance. |
-| **Approve / Reject Leave**| Yes | Team Only | No | Manager cannot approve for other teams (IDOR protection) or approve self. |
+The backend API strictly enforces all evaluation edge cases verified by unit tests (`python manage.py test tests_edge_cases`):
 
----
-
-## 🧪 Defensive Business Logic & Edge Cases
-
-All 11 edge cases specified in PDF Section 7 are handled defensively in the backend API and covered by automated test cases (`python manage.py test tests_edge_cases`):
-
-1. **Overlapping Leave Requests**: Mathematical interval overlap formula (`start_date <= existing.end_date AND end_date >= existing.start_date`) rejects overlapping applications for both `PENDING` and `APPROVED` leaves.
-2. **End Date Before Start Date**: Rejected at serializer validation with HTTP 400.
-3. **Leave on Date Already Attended**: Checks attendance table; if `PRESENT` or `HALF_DAY` is already recorded, leave submission is blocked.
-4. **Employee Cancelling Leave**: Only `PENDING` requests can be cancelled by the requester. `APPROVED` requests require HR intervention.
-5. **Manager Approving Another Team's Leave (IDOR)**: API verifies `leave.user.manager == request.user`. Returns HTTP 403 if attempting cross-team action.
-6. **Duplicate Daily Check-In**: Database unique constraint on `(user, date)` + view guard returns HTTP 400: *"Already checked in for today."*
-7. **Check-Out Without Check-In**: Rejected with HTTP 400: *"Cannot check out without checking in first."*
-8. **Check-In While On Approved Leave**: Blocked if today falls within an approved leave range.
-9. **Employee Modifying Another's Attendance**: Check-in/out APIs ignore any caller-supplied employee ID and strictly use `request.user` from the authenticated token.
-10. **Manager Self-Approval Prevention**: Blocked with HTTP 403: *"You cannot approve your own leave request. It must be approved by HR."*
-11. **Deactivated Employee Access**: Blocked at login with HTTP 400: *"Account is deactivated. Please contact HR."*
+1. **Dual Approval Rule**: Overall leave status remains `PENDING` until both Manager and HR/Admin approve.
+2. **HR Self-Leave Block**: HR/Admin users cannot submit leave requests (`role != 'ADMIN'`).
+3. **No Overlapping Leaves**: Mathematical interval overlap detection (`start_date <= existing.end_date AND end_date >= existing.start_date`) blocks double-booking.
+4. **Attendance Date Guard**: Cannot apply for leave on a date where attendance (`PRESENT` / `HALF_DAY`) already exists.
+5. **No Leave Check-In**: Blocked from checking in if today falls within an approved leave duration.
+6. **Single Daily Check-In**: Unique constraint on `(user, date)` prevents duplicate daily check-ins.
+7. **Check-Out Validation**: Cannot check out without an existing check-in for the day.
+8. **IDOR & Self-Approval Guards**: Managers can only approve/reject their own team members and cannot approve their own leaves.
+9. **Strict Field Validation**: Format enforcement on corporate emails and 10-15 digit phone numbers.
 
 ---
 
-## 💻 Installation & Setup Guide
+## 📡 API Documentation Reference
+
+### Authentication API
+- `POST /api/accounts/login/` — Authenticate user and receive JWT access/refresh tokens.
+- `GET /api/accounts/me/` — Retrieve authenticated user profile and permissions.
+
+### Employees API
+- `GET /api/employees/` — List employees (Admin: All, Manager: Team members).
+- `POST /api/employees/` — Create new employee (Admin only, auto-generates `EMP-E{xx}`).
+- `PUT /api/employees/{id}/` — Update employee profile details.
+
+### Attendance API
+- `GET /api/attendance/` — View attendance records.
+- `POST /api/attendance/check_in/` — Punch in for today.
+- `POST /api/attendance/check_out/` — Punch out for today.
+
+### Leaves API
+- `GET /api/leaves/` — List leave requests (filtered by status and scope `mine`/`team`).
+- `POST /api/leaves/apply/` — Submit new leave request.
+- `POST /api/leaves/{id}/approve/` — Approve leave request (Manager / HR).
+- `POST /api/leaves/{id}/reject/` — Reject leave request with required reason.
+- `POST /api/leaves/{id}/cancel/` — Cancel pending leave request.
+
+### Dashboard API
+- `GET /api/dashboard/metrics/` — Aggregate metrics, department headcounts, and attendance stats.
+
+---
+
+## 💻 Local Installation & Setup
 
 ### Prerequisites
-- **Node.js**: v18+ (tested on v24)
-- **Python**: v3.10+ (tested on v3.13)
+- **Python**: v3.10+
+- **Node.js**: v18+
 - **Git**
-- **PostgreSQL** (optional, SQLite is pre-configured for instant zero-dependency local testing)
 
----
-
-### Step 1: Backend Setup (Django)
-
+### Step 1: Backend Setup
 ```bash
-# Navigate to backend directory
 cd backend
-
-# Create and activate Python virtual environment
 python -m venv venv
 
-# On Windows:
+# Activate Virtual Environment (Windows)
 .\venv\Scripts\activate
-# On macOS / Linux:
+
+# Activate Virtual Environment (macOS/Linux)
 source venv/bin/activate
 
-# Install dependencies
+# Install Dependencies
 pip install -r requirements.txt
 
-# Run migrations
+# Run Migrations
 python manage.py migrate
 
-# Seed demo users and realistic history
+# Seed Initial Organizational Data
 python seed_data.py
 
-# Run backend automated edge-case test suite (optional)
+# Run Automated Test Suite
 python manage.py test tests_edge_cases
 
-# Start Django development server
+# Start Backend Server
 python manage.py runserver 8000
 ```
-*The Django REST API will be running at `http://localhost:8000/api`.*
+*API running at: `http://localhost:8000/api`*
 
----
-
-### Step 2: Frontend Setup (React + Vite)
-
+### Step 2: Frontend Setup
 ```bash
-# In a new terminal, navigate to frontend directory
+# Open a new terminal
 cd frontend
-
-# Install npm packages
 npm install
-
-# Start Vite dev server
 npm run dev
 ```
-*The React web portal will be accessible at `http://localhost:5173`.*
+*Frontend running at: `http://localhost:5173`*
 
 ---
 
-## 📝 Environment Variables
+## 🌐 Vercel Deployment Guide
 
-### Backend (`backend/.env`):
-```env
-SECRET_KEY=your_django_secret_key
-DEBUG=True
+This project is pre-configured for seamless deployment to **Vercel** as a unified monorepo.
 
-# Database Configuration:
-# Set USE_POSTGRES=True to connect to a live PostgreSQL database
-USE_POSTGRES=False
-DB_NAME=hrms_db
-DB_USER=postgres
-DB_PASSWORD=your_postgres_password
-DB_HOST=localhost
-DB_PORT=5432
-```
+### Option A: Via Vercel Web Dashboard (Recommended)
+1. Push your repository to GitHub.
+2. Log into [vercel.com](https://vercel.com) and click **"Add New Project"**.
+3. Import your GitHub repository.
+4. Vercel will automatically detect `vercel.json` and deploy both the Python Django backend and React frontend.
 
-### Frontend (`frontend/.env`):
-```env
-VITE_API_BASE_URL=http://localhost:8000/api
+### Option B: Via Vercel CLI
+```bash
+npm install -g vercel
+vercel
 ```
 
 ---
 
-## 🤖 AI Development Process & Code Review
+## 🗺️ Complete Product Roadmap
 
-Complete details as mandated by PDF Sections 8 & 9 are documented in **[`docs/AI_DEVELOPMENT_REPORT.md`](docs/AI_DEVELOPMENT_REPORT.md)**:
-- **5 Detailed AI Prompts**: Covers prompt text, rationale, AI approach, accepted elements, and modifications.
-- **2 AI Code Review Challenges**:
-  1. *Flawed Date Overlap Validation*: AI used strict subset intervals (`start_date__gte`); fixed with mathematical interval intersection (`start_date__lte=end_date AND end_date__gte=start_date`).
-  2. *Insecure Direct Object Reference (IDOR) in Leave Approval*: AI omitted team boundary and self-approval checks; fixed with server-side ownership enforcement.
+```mermaid
+gantt
+    title Workivo HRMS Product Roadmap
+    dateFormat  YYYY-MM-DD
+    section Phase 1 (Core HRMS - Complete)
+    Authentication & RBAC              :done, p1_1, 2026-08-01, 2026-08-15
+    Attendance & Check-in Engine       :done, p1_2, 2026-08-15, 2026-08-30
+    Dual Leave Approval Pipeline       :done, p1_3, 2026-09-01, 2026-09-10
+    Light Theme UI Restoration        :done, p1_4, 2026-09-11, 2026-09-16
+    section Phase 2 (Enterprise & Payroll - Q4 2026)
+    Payroll & Salary Slip Generator    :active, p2_1, 2026-10-01, 2026-10-31
+    Shift Management & Overtime Tracking: p2_2, 2026-11-01, 2026-11-20
+    Email / Push Notifications (AWS SES): p2_3, 2026-11-20, 2026-12-15
+    section Phase 3 (AI & Mobile Integration - Q1 2027)
+    Native Mobile App (React Native)    : p3_1, 2027-01-05, 2027-02-28
+    AI Predictive Attrition Analytics  : p3_2, 2027-03-01, 2027-04-15
+```
+
+### 📍 Milestone Breakdown
+
+#### ✅ Phase 1: Core Foundation & UI Excellence (Completed)
+- [x] Stateless JWT Authentication & BCrypt hashing.
+- [x] Auto-incrementing Employee IDs (`EMP-E{xx}`).
+- [x] 6-Department Pre-seeded Organizational hierarchy & Reporting Managers.
+- [x] Dual-level leave approval workflow (`Manager -> HR/Admin`).
+- [x] Real-time daily check-in / check-out with automatic hours calculation.
+- [x] Clean, high-contrast Light Theme UI design system.
+- [x] Automated 9-point edge case test suite.
+- [x] Vercel Monorepo deployment readiness.
+
+#### 🚧 Phase 2: Enterprise Payroll & Notifications (Q4 2026)
+- [ ] **Automated Payroll Engine**: Generate monthly payslips with tax deductions, HRA, PF, and bonuses.
+- [ ] **Shift & Overtime Management**: Support night shifts, weekend rosters, and automated overtime pay calculations.
+- [ ] **Outbound Email Notifications**: Send instant SMTP email alerts on leave approval, rejection, and check-in reminders.
+- [ ] **Document Repository**: Secure cloud upload for employee ID proofs, offer letters, and contracts.
+
+#### 🚀 Phase 3: AI Intelligence & Mobile Ecosystem (Q1 2027)
+- [ ] **Native Mobile Application**: Cross-platform React Native app with biometric (FaceID/Fingerprint) punch-in.
+- [ ] **Geofencing & IP Restrictions**: Ensure employees punch in strictly within office GPS coordinates or corporate Wi-Fi IPs.
+- [ ] **AI Flight Risk Analytics**: ML model predicting potential employee burnout or attrition based on attendance patterns and leave velocity.
+- [ ] **Slack & Microsoft Teams Integration**: Apply for leaves directly using `/leave` slash commands in Slack.
 
 ---
-
-## ⚡ Known Limitations & Future Roadmap
-
-1. **Biometrics & Geofencing**: Per assessment instructions, physical hardware integrations were excluded in favor of clean application logic.
-2. **Leave Balance Policies**: Currently records total leave counts; future iterations can add automated annual leave accrual quotas.
-3. **Email SMTP Dispatch**: Currently logs leave statuses in-app; can be hooked up to AWS SES or SendGrid for outbound employee emails.
-
----
-
-*Developed for AppTrait Solutions Assessment | Ghodasar, Ahmedabad.*

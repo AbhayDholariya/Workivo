@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Lock, Mail, Sparkles, ArrowRight, ShieldCheck, UserCheck, Briefcase } from 'lucide-react';
+import { Lock, Mail, Sparkles, ArrowRight } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function LoginPage() {
@@ -33,12 +33,6 @@ export default function LoginPage() {
     }
   };
 
-  const fillDemo = (demoEmail, demoPassword, roleName) => {
-    setEmail(demoEmail);
-    setPassword(demoPassword);
-    toast.success(`Loaded demo account: ${roleName}`);
-  };
-
   return (
     <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-slate-50 text-slate-900">
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
@@ -55,42 +49,6 @@ export default function LoginPage() {
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md px-4 sm:px-0">
         <div className="bg-white py-8 px-6 shadow-md rounded-2xl border border-slate-200 sm:px-10">
-          {/* Quick Demo Credentials Switcher */}
-          <div className="mb-6 p-4 bg-slate-50 rounded-2xl border border-slate-200">
-            <div className="flex items-center gap-2 text-xs font-bold text-slate-700 uppercase tracking-wider mb-2.5">
-              <Sparkles className="w-4 h-4 text-indigo-600" />
-              <span>1-Click Quick Demo Login:</span>
-            </div>
-            <div className="grid grid-cols-3 gap-2">
-              <button
-                type="button"
-                onClick={() => fillDemo('admin@company.com', 'Admin@123', 'HR / Admin')}
-                className="px-2 py-2 text-xs font-semibold bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 rounded-xl transition flex flex-col items-center gap-1 shadow-xs"
-              >
-                <ShieldCheck className="w-4 h-4 text-purple-600" />
-                <span>HR / Admin</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => fillDemo('anil@company.com', 'Manager@123', 'Manager')}
-                className="px-2 py-2 text-xs font-semibold bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-xl transition flex flex-col items-center gap-1 shadow-xs"
-              >
-                <Briefcase className="w-4 h-4 text-blue-600" />
-                <span>Manager</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => fillDemo('employee@company.com', 'Employee@123', 'Employee')}
-                className="px-2 py-2 text-xs font-semibold bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-xl transition flex flex-col items-center gap-1 shadow-xs"
-              >
-                <UserCheck className="w-4 h-4 text-emerald-600" />
-                <span>Employee</span>
-              </button>
-            </div>
-          </div>
-
           <form className="space-y-4" onSubmit={handleLogin}>
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">

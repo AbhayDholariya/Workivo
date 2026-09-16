@@ -1,16 +1,77 @@
-# React + Vite
+# 🎨 Workivo HRMS — Frontend Web Application
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+The frontend portal for **Workivo HRMS**, built with **React.js 19 (Pure JavaScript)**, **Vite 8**, and **Tailwind CSS 3**.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🚀 Key Technologies
+- **React.js 19**: Modern UI component library with Hooks and Context API.
+- **Vite 8**: Ultra-fast build tool and local development server.
+- **Tailwind CSS 3**: Clean, responsive styling with utility classes.
+- **React Router v7**: Client-side routing with protected role-based routes.
+- **Lucide React**: Clean modern icon set.
+- **React Hot Toast**: Real-time user notification toasts.
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 📁 Directory Structure
 
-## Expanding the Oxlint configuration
+```
+frontend/
+├── index.html
+├── vite.config.js
+├── tailwind.config.js
+├── vercel.json
+├── package.json
+└── src/
+    ├── api/                  # Axios HTTP client with JWT interceptors
+    │   ├── client.js
+    │   ├── authApi.js
+    │   ├── employeeApi.js
+    │   ├── attendanceApi.js
+    │   ├── leaveApi.js
+    │   └── dashboardApi.js
+    ├── context/              # AuthContext session state & user role
+    ├── components/           # Reusable UI components
+    │   ├── Navbar.jsx
+    │   ├── Sidebar.jsx
+    │   ├── MetricCard.jsx
+    │   ├── StatusBadge.jsx
+    │   ├── Modal.jsx
+    │   └── ProtectedRoute.jsx
+    └── pages/                # Application Views
+        ├── LoginPage.jsx
+        ├── DashboardPage.jsx
+        ├── EmployeesPage.jsx
+        ├── AttendancePage.jsx
+        ├── LeavesPage.jsx
+        └── ProfilePage.jsx
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+---
+
+## 🛠️ Local Setup & Commands
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+```
+
+---
+
+## 🌐 Environment Variables
+
+Create a `.env` file in `frontend/`:
+```env
+VITE_API_BASE_URL=http://localhost:8000/api
+```
+*(In production, set `VITE_API_BASE_URL` to your live deployed backend URL).*
