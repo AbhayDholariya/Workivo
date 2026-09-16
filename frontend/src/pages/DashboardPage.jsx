@@ -66,7 +66,16 @@ export default function DashboardPage() {
       toast.success(res.message || 'Checked in successfully!');
       fetchDashboardData();
     } catch (err) {
-      toast.error(err.response?.data?.detail || 'Failed to check in.');
+      const data = err.response?.data;
+      let msg = 'Failed to check in.';
+      if (data) {
+        if (typeof data === 'string') msg = data;
+        else if (data.detail) msg = data.detail;
+        else if (data.error) msg = data.error;
+        else if (data.message) msg = data.message;
+        else if (data.non_field_errors?.[0]) msg = data.non_field_errors[0];
+      }
+      toast.error(msg);
     } finally {
       setActionLoading(false);
     }
@@ -79,7 +88,16 @@ export default function DashboardPage() {
       toast.success(res.message || 'Checked out successfully!');
       fetchDashboardData();
     } catch (err) {
-      toast.error(err.response?.data?.detail || 'Failed to check out.');
+      const data = err.response?.data;
+      let msg = 'Failed to check out.';
+      if (data) {
+        if (typeof data === 'string') msg = data;
+        else if (data.detail) msg = data.detail;
+        else if (data.error) msg = data.error;
+        else if (data.message) msg = data.message;
+        else if (data.non_field_errors?.[0]) msg = data.non_field_errors[0];
+      }
+      toast.error(msg);
     } finally {
       setActionLoading(false);
     }
