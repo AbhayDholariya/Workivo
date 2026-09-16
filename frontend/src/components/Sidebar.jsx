@@ -77,7 +77,7 @@ export default function Sidebar() {
       </div>
 
       <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-        <p className="text-xs font-semibold text-slate-700">AppTrait HRMS Assessment</p>
+        <p className="text-xs font-semibold text-slate-700">Workivo HRMS Portal</p>
         <p className="text-[11px] text-slate-400 mt-0.5">Vibe Coder Practical Task</p>
         <div className="mt-2 pt-2 border-t border-slate-200/60 flex items-center justify-between text-[11px] text-slate-500">
           <span>Role: <strong>{user?.role}</strong></span>

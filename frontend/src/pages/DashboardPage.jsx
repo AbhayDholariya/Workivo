@@ -226,20 +226,28 @@ export default function DashboardPage() {
                           {req.reason}
                         </td>
                         <td className="px-6 py-3.5 text-right space-x-2">
-                          <button
-                            onClick={() => handleApproveLeave(req.id)}
-                            disabled={actionLoading}
-                            className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow-xs disabled:opacity-50"
-                          >
-                            Approve
-                          </button>
-                          <button
-                            onClick={() => openRejectModal(req.id)}
-                            disabled={actionLoading}
-                            className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg text-xs font-semibold disabled:opacity-50"
-                          >
-                            Reject
-                          </button>
+                          {req.admin_approval === 'APPROVED' ? (
+                            <span className="text-xs font-medium text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
+                              HR Approved (Awaiting Mgr)
+                            </span>
+                          ) : (
+                            <>
+                              <button
+                                onClick={() => handleApproveLeave(req.id)}
+                                disabled={actionLoading}
+                                className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow-xs disabled:opacity-50"
+                              >
+                                Approve
+                              </button>
+                              <button
+                                onClick={() => openRejectModal(req.id)}
+                                disabled={actionLoading}
+                                className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg text-xs font-semibold disabled:opacity-50"
+                              >
+                                Reject
+                              </button>
+                            </>
+                          )}
                         </td>
                       </tr>
                     ))}
@@ -331,20 +339,28 @@ export default function DashboardPage() {
                           {req.reason}
                         </td>
                         <td className="px-6 py-3.5 text-right space-x-2">
-                          <button
-                            onClick={() => handleApproveLeave(req.id)}
-                            disabled={actionLoading}
-                            className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow-xs disabled:opacity-50"
-                          >
-                            Approve
-                          </button>
-                          <button
-                            onClick={() => openRejectModal(req.id)}
-                            disabled={actionLoading}
-                            className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg text-xs font-semibold disabled:opacity-50"
-                          >
-                            Reject
-                          </button>
+                          {req.manager_approval === 'APPROVED' ? (
+                            <span className="text-xs font-medium text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
+                              Manager Approved (Awaiting HR)
+                            </span>
+                          ) : (
+                            <>
+                              <button
+                                onClick={() => handleApproveLeave(req.id)}
+                                disabled={actionLoading}
+                                className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow-xs disabled:opacity-50"
+                              >
+                                Approve
+                              </button>
+                              <button
+                                onClick={() => openRejectModal(req.id)}
+                                disabled={actionLoading}
+                                className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg text-xs font-semibold disabled:opacity-50"
+                              >
+                                Reject
+                              </button>
+                            </>
+                          )}
                         </td>
                       </tr>
                     ))}

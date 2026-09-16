@@ -14,7 +14,8 @@ import {
   Mail, 
   Phone,
   Building,
-  UserCheck
+  UserCheck,
+  Calendar
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -40,10 +41,11 @@ export default function EmployeesPage() {
     last_name: '',
     email: '',
     phone: '',
-    department: 'Engineering',
+    department: 'Software Development',
     designation: 'Software Engineer',
     role: 'EMPLOYEE',
     manager: '',
+    joining_date: new Date().toISOString().slice(0, 10),
     password: 'Employee@123',
   };
   const [formData, setFormData] = useState(initialForm);
@@ -72,27 +74,78 @@ export default function EmployeesPage() {
   }, [search, department, statusFilter]);
 
   const handleOpenAdd = () => {
-    // Auto-generate employee ID candidate
-    const nextNum = employees.length + 10;
+    // Extract numbers from existing employee IDs starting with EMP-E
+    const empNumbers = employees
+      .map((e) => {
+        const match = (e.employee_id || '').match(/EMP-E(\d+)/i);
+        return match ? parseInt(match[1], 10) : 0;
+      })
+      .filter((n) => !isNaN(n));
+
+    const maxEmpNum = empNumbers.length > 0 ? Math.max(...empNumbers) : 0;
+    const nextEmpId = `EMP-E${String(maxEmpNum + 1).padStart(2, '0')}`;
+
     setFormData({
       ...initialForm,
-      employee_id: `EMP-${String(nextNum).padStart(3, '0')}`,
+      employee_id: nextEmpId,
+      joining_date: new Date().toISOString().slice(0, 10),
+      role: 'EMPLOYEE',
     });
     setAddModalOpen(true);
   };
 
+  const handleManagerSelect = (managerId) => {
+    const selectedMgr = employees.find((m) => String(m.id) === String(managerId));
+    if (selectedMgr) {
+      setFormData((prev) => ({
+        ...prev,
+        manager: managerId,
+        department: selectedMgr.department || prev.department,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        manager: managerId,
+      }));
+    }
+  };
+
   const handleCreate = async (e) => {
     e.preventDefault();
+
+    // 1. Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      toast.error('Please enter a valid corporate email address (e.g. user@company.com).');
+      return;
+    }
+
+    // 2. Phone format validation
+    const phoneCleaned = (formData.phone || '').replace(/[\s\-\(\)]/g, '');
+    if (!phoneCleaned || !/^\+?[0-9]{10,15}$/.test(phoneCleaned)) {
+      toast.error('Please enter a valid 10-digit mobile phone number.');
+      return;
+    }
+
+    // 3. Joining date validation
+    if (!formData.joining_date) {
+      toast.error('Please select a Joining Date.');
+      return;
+    }
+
     setActionLoading(true);
     try {
-      const payload = { ...formData };
+      const payload = { ...formData, role: 'EMPLOYEE' };
       if (!payload.manager) delete payload.manager;
       await employeeApi.create(payload);
       toast.success('Employee created successfully!');
       setAddModalOpen(false);
       fetchEmployees();
     } catch (err) {
-      const msg = err.response?.data?.detail || 
+      const msg = err.response?.data?.email?.[0] || 
+                  err.response?.data?.phone?.[0] || 
+                  err.response?.data?.joining_date?.[0] || 
+                  err.response?.data?.detail || 
                   JSON.stringify(err.response?.data) || 
                   'Failed to create employee.';
       toast.error(msg);
@@ -110,6 +163,7 @@ export default function EmployeesPage() {
       department: emp.department || '',
       designation: emp.designation || '',
       role: emp.role || 'EMPLOYEE',
+      joining_date: emp.joining_date || new Date().toISOString().slice(0, 10),
       manager: emp.manager || '',
     });
     setEditModalOpen(true);
@@ -117,6 +171,16 @@ export default function EmployeesPage() {
 
   const handleUpdate = async (e) => {
     e.preventDefault();
+
+    // Phone format validation on update
+    if (formData.phone) {
+      const phoneCleaned = formData.phone.replace(/[\s\-\(\)]/g, '');
+      if (!/^\+?[0-9]{10,15}$/.test(phoneCleaned)) {
+        toast.error('Please enter a valid 10-digit mobile phone number.');
+        return;
+      }
+    }
+
     setActionLoading(true);
     try {
       const payload = { ...formData };
@@ -126,7 +190,8 @@ export default function EmployeesPage() {
       setEditModalOpen(false);
       fetchEmployees();
     } catch (err) {
-      toast.error('Failed to update employee.');
+      const msg = err.response?.data?.phone?.[0] || err.response?.data?.detail || 'Failed to update employee.';
+      toast.error(msg);
     } finally {
       setActionLoading(false);
     }
@@ -187,10 +252,12 @@ export default function EmployeesPage() {
             className="px-3 py-2 border border-slate-200 rounded-xl text-sm text-slate-600 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
           >
             <option value="">All Departments</option>
-            <option value="Engineering">Engineering</option>
+            <option value="Software Development">Software Development</option>
+            <option value="QA Testing">QA Testing</option>
+            <option value="CyberSecurity">CyberSecurity</option>
+            <option value="UI/UX Designer">UI/UX Designer</option>
             <option value="Sales & Marketing">Sales & Marketing</option>
-            <option value="Human Resources">Human Resources</option>
-            <option value="Support">Support</option>
+            <option value="Technical Support">Technical Support</option>
           </select>
 
           <select
@@ -224,6 +291,7 @@ export default function EmployeesPage() {
                   <th className="px-6 py-3.5">Department & Role</th>
                   <th className="px-6 py-3.5">Contact</th>
                   <th className="px-6 py-3.5">Reporting Manager</th>
+                  <th className="px-6 py-3.5">Joining Date</th>
                   <th className="px-6 py-3.5">Status</th>
                   <th className="px-6 py-3.5 text-right">Actions</th>
                 </tr>
@@ -256,6 +324,9 @@ export default function EmployeesPage() {
                       ) : (
                         <span className="text-slate-400 italic">None (Top Level)</span>
                       )}
+                    </td>
+                    <td className="px-6 py-4 text-xs font-medium text-slate-700">
+                      {emp.joining_date || 'N/A'}
                     </td>
                     <td className="px-6 py-4">
                       <StatusBadge status={emp.employment_status} />
@@ -308,16 +379,11 @@ export default function EmployeesPage() {
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">Role *</label>
-              <select
-                value={formData.role}
-                onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                className="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-              >
-                <option value="EMPLOYEE">Employee</option>
-                <option value="MANAGER">Manager</option>
-                <option value="ADMIN">HR / Admin</option>
-              </select>
+              <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">User Role</label>
+              <div className="w-full p-2.5 bg-slate-100 border border-slate-200 rounded-xl text-sm text-slate-700 font-semibold flex items-center gap-2">
+                <UserCheck className="w-4 h-4 text-emerald-600" />
+                <span>Employee (Default)</span>
+              </div>
             </div>
           </div>
 
@@ -329,6 +395,7 @@ export default function EmployeesPage() {
                 required
                 value={formData.first_name}
                 onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
+                placeholder="e.g. Rahul"
                 className="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
               />
             </div>
@@ -339,6 +406,7 @@ export default function EmployeesPage() {
                 required
                 value={formData.last_name}
                 onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
+                placeholder="e.g. Sharma"
                 className="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
               />
             </div>
@@ -352,15 +420,18 @@ export default function EmployeesPage() {
                 required
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                placeholder="rahul@company.com"
                 className="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">Phone Number</label>
+              <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">Mobile Phone (10 Digits) *</label>
               <input
-                type="text"
+                type="tel"
+                required
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                placeholder="e.g. 9876543210"
                 className="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
               />
             </div>
@@ -369,13 +440,18 @@ export default function EmployeesPage() {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">Department *</label>
-              <input
-                type="text"
-                required
+              <select
                 value={formData.department}
                 onChange={(e) => setFormData({ ...formData, department: e.target.value })}
                 className="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-              />
+              >
+                <option value="Software Development">Software Development</option>
+                <option value="QA Testing">QA Testing</option>
+                <option value="CyberSecurity">CyberSecurity</option>
+                <option value="UI/UX Designer">UI/UX Designer</option>
+                <option value="Sales & Marketing">Sales & Marketing</option>
+                <option value="Technical Support">Technical Support</option>
+              </select>
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">Designation *</label>
@@ -384,36 +460,49 @@ export default function EmployeesPage() {
                 required
                 value={formData.designation}
                 onChange={(e) => setFormData({ ...formData, designation: e.target.value })}
+                placeholder="e.g. Software Engineer"
+                className="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">Reporting Manager *</label>
+              <select
+                value={formData.manager}
+                onChange={(e) => handleManagerSelect(e.target.value)}
+                className="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              >
+                <option value="">Select Department Manager...</option>
+                {managersList.map((m) => (
+                  <option key={m.id} value={m.id}>
+                    {m.full_name} ({m.department})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">Joining Date *</label>
+              <input
+                type="date"
+                required
+                value={formData.joining_date}
+                onChange={(e) => setFormData({ ...formData, joining_date: e.target.value })}
                 className="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">Reporting Manager</label>
-            <select
-              value={formData.manager}
-              onChange={(e) => setFormData({ ...formData, manager: e.target.value })}
-              className="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-            >
-              <option value="">None (Top Level)</option>
-              {managersList.map((m) => (
-                <option key={m.id} value={m.id}>
-                  {m.full_name} ({m.department})
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">Temporary Initial Password</label>
+            <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">Temporary Password</label>
             <input
               type="text"
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               className="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none font-mono"
             />
-            <p className="text-[11px] text-slate-400 mt-1">Automatically translated to BCrypt hash before database persistence.</p>
           </div>
 
           <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
@@ -491,12 +580,18 @@ export default function EmployeesPage() {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">Department</label>
-              <input
-                type="text"
+              <select
                 value={formData.department}
                 onChange={(e) => setFormData({ ...formData, department: e.target.value })}
                 className="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-              />
+              >
+                <option value="Software Development">Software Development</option>
+                <option value="QA Testing">QA Testing</option>
+                <option value="CyberSecurity">CyberSecurity</option>
+                <option value="UI/UX Designer">UI/UX Designer</option>
+                <option value="Sales & Marketing">Sales & Marketing</option>
+                <option value="Technical Support">Technical Support</option>
+              </select>
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">Designation</label>
@@ -509,22 +604,34 @@ export default function EmployeesPage() {
             </div>
           </div>
 
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">Reporting Manager</label>
-            <select
-              value={formData.manager || ''}
-              onChange={(e) => setFormData({ ...formData, manager: e.target.value })}
-              className="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-            >
-              <option value="">None (Top Level)</option>
-              {managersList
-                .filter((m) => m.id !== selectedEmployee?.id)
-                .map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {m.full_name} ({m.department})
-                  </option>
-                ))}
-            </select>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">Reporting Manager</label>
+              <select
+                value={formData.manager || ''}
+                onChange={(e) => handleManagerSelect(e.target.value)}
+                className="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              >
+                <option value="">None (Top Level)</option>
+                {managersList
+                  .filter((m) => m.id !== selectedEmployee?.id)
+                  .map((m) => (
+                    <option key={m.id} value={m.id}>
+                      {m.full_name} ({m.department})
+                    </option>
+                  ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">Joining Date</label>
+              <input
+                type="date"
+                value={formData.joining_date || ''}
+                onChange={(e) => setFormData({ ...formData, joining_date: e.target.value })}
+                className="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              />
+            </div>
           </div>
 
           <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">

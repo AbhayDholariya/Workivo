@@ -19,15 +19,22 @@ class LeaveRequestSerializer(serializers.ModelSerializer):
     user = LeaveUserSerializer(read_only=True)
     actioned_by_name = serializers.SerializerMethodField()
     duration_days = serializers.SerializerMethodField()
+    approval_display_text = serializers.SerializerMethodField()
 
     class Meta:
         model = LeaveRequest
         fields = [
             'id', 'user', 'leave_type', 'start_date', 'end_date', 'reason',
-            'status', 'actioned_by', 'actioned_by_name', 'rejection_reason',
-            'actioned_at', 'duration_days', 'created_at'
+            'status', 'manager_approval', 'admin_approval',
+            'manager_actioned_at', 'admin_actioned_at',
+            'actioned_by', 'actioned_by_name', 'rejection_reason',
+            'actioned_at', 'duration_days', 'approval_display_text', 'created_at'
         ]
-        read_only_fields = ['id', 'status', 'actioned_by', 'actioned_at', 'created_at']
+        read_only_fields = [
+            'id', 'status', 'manager_approval', 'admin_approval',
+            'manager_actioned_at', 'admin_actioned_at', 'actioned_by',
+            'actioned_at', 'created_at'
+        ]
 
     def get_actioned_by_name(self, obj):
         if obj.actioned_by:
@@ -39,6 +46,25 @@ class LeaveRequestSerializer(serializers.ModelSerializer):
         if obj.start_date and obj.end_date:
             return (obj.end_date - obj.start_date).days + 1
         return 1
+
+    def get_approval_display_text(self, obj):
+        if obj.status == LeaveRequest.Status.APPROVED:
+            return "Fully Approved"
+        if obj.status == LeaveRequest.Status.REJECTED:
+            return "Rejected"
+        if obj.status == LeaveRequest.Status.CANCELLED:
+            return "Cancelled"
+        
+        # Requester is a Manager: only HR Approval needed
+        if obj.user.role == User.Role.MANAGER:
+            return "Awaiting HR / Admin Approval"
+        
+        # Requester is an Employee: Dual Approval tracking
+        if obj.manager_approval == LeaveRequest.ApprovalStatus.APPROVED and obj.admin_approval == LeaveRequest.ApprovalStatus.PENDING:
+            return "Manager Approved (Awaiting HR)"
+        if obj.admin_approval == LeaveRequest.ApprovalStatus.APPROVED and obj.manager_approval == LeaveRequest.ApprovalStatus.PENDING:
+            return "HR Approved (Awaiting Manager)"
+        return "Pending Manager & HR Approval"
 
 class LeaveApplySerializer(serializers.ModelSerializer):
     class Meta:

@@ -14,6 +14,11 @@ class LeaveRequest(models.Model):
         REJECTED = 'REJECTED', 'Rejected'
         CANCELLED = 'CANCELLED', 'Cancelled'
 
+    class ApprovalStatus(models.TextChoices):
+        PENDING = 'PENDING', 'Pending'
+        APPROVED = 'APPROVED', 'Approved'
+        REJECTED = 'REJECTED', 'Rejected'
+
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, 
         on_delete=models.CASCADE, 
@@ -24,6 +29,20 @@ class LeaveRequest(models.Model):
     end_date = models.DateField()
     reason = models.TextField()
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
+
+    # Dual approval tracking fields
+    manager_approval = models.CharField(
+        max_length=20, 
+        choices=ApprovalStatus.choices, 
+        default=ApprovalStatus.PENDING
+    )
+    admin_approval = models.CharField(
+        max_length=20, 
+        choices=ApprovalStatus.choices, 
+        default=ApprovalStatus.PENDING
+    )
+    manager_actioned_at = models.DateTimeField(null=True, blank=True)
+    admin_actioned_at = models.DateTimeField(null=True, blank=True)
     
     # Approval metadata
     actioned_by = models.ForeignKey(

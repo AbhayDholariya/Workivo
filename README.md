@@ -1,6 +1,6 @@
-# PulseHRMS — Mini Human Resource Management System
+# Workivo — Human Resource Management System
 
-A production-grade, full-stack Mini HRMS developed for a small SaaS company adhering to all specifications and evaluation criteria in the **AppTrait Solutions Practical Assessment: Vibe Coder**.
+A production-grade, full-stack HRMS developed for a small SaaS company adhering to all specifications and evaluation criteria in the **AppTrait Solutions Practical Assessment: Vibe Coder**.
 
 ---
 
@@ -19,7 +19,7 @@ A production-grade, full-stack Mini HRMS developed for a small SaaS company adhe
 
 ## 🚀 Project Overview
 
-PulseHRMS is designed to manage employee lifecycles, attendance tracking (check-in/check-out with duration calculations), multi-stage leave approvals, and role-specific analytics dashboards for three user tiers:
+Workivo is designed to manage employee lifecycles, attendance tracking (check-in/check-out with duration calculations), multi-stage leave approvals, and role-specific analytics dashboards for three user tiers:
 - **HR / Admin**: Complete organizational oversight, employee creation, deactivation, and global leave/attendance controls.
 - **Manager**: Team-scoped oversight, team attendance monitoring, and team leave approvals/rejections with mandatory reasons.
 - **Employee**: Self-service portal for punching in/out, viewing personal attendance timeline, applying for leaves, and profile management.

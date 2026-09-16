@@ -154,28 +154,32 @@ export default function LeavesPage() {
             Submit leave requests, track approval statuses, and manage team absences.
           </p>
         </div>
-        <button
-          onClick={() => setApplyModalOpen(true)}
-          className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl transition shadow-xs self-start sm:self-auto"
-        >
-          <PlusCircle className="w-4 h-4" />
-          <span>Apply for Leave</span>
-        </button>
+        {role !== 'ADMIN' && (
+          <button
+            onClick={() => setApplyModalOpen(true)}
+            className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl transition shadow-xs self-start sm:self-auto"
+          >
+            <PlusCircle className="w-4 h-4" />
+            <span>Apply for Leave</span>
+          </button>
+        )}
       </div>
 
       {/* Tabs & Filters */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-200 pb-3">
         <div className="flex gap-2">
-          <button
-            onClick={() => setActiveTab('mine')}
-            className={`px-4 py-2 text-xs font-semibold rounded-xl transition ${
-              activeTab === 'mine'
-                ? 'bg-indigo-600 text-white shadow-xs'
-                : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
-            }`}
-          >
-            My Leave Requests
-          </button>
+          {role !== 'ADMIN' && (
+            <button
+              onClick={() => setActiveTab('mine')}
+              className={`px-4 py-2 text-xs font-semibold rounded-xl transition ${
+                activeTab === 'mine'
+                  ? 'bg-indigo-600 text-white shadow-xs'
+                  : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+              }`}
+            >
+              My Leave Requests
+            </button>
+          )}
 
           {role !== 'EMPLOYEE' && (
             <button
@@ -232,7 +236,9 @@ export default function LeavesPage() {
               <tbody className="divide-y divide-slate-100">
                 {leaves.map((leave) => {
                   const isOwner = leave.user?.employee_id === user?.employee_id;
-                  const canAction = (role === 'ADMIN' || (role === 'MANAGER' && !isOwner)) && leave.status === 'PENDING';
+                  const isManagerActionable = role === 'MANAGER' && !isOwner && leave.manager_approval === 'PENDING' && leave.status === 'PENDING';
+                  const isAdminActionable = role === 'ADMIN' && leave.admin_approval === 'PENDING' && leave.status === 'PENDING';
+                  const canAction = isManagerActionable || isAdminActionable;
 
                   return (
                     <tr key={leave.id} className="hover:bg-slate-50/50 transition-colors">
@@ -255,9 +261,29 @@ export default function LeavesPage() {
                       </td>
                       <td className="px-6 py-4">
                         <StatusBadge status={leave.status} />
-                        {leave.actioned_by_name && (
-                          <p className="text-[11px] text-slate-400 mt-1">by {leave.actioned_by_name}</p>
-                        )}
+                        <p className="text-[11px] font-medium text-slate-600 mt-1">
+                          {leave.approval_display_text}
+                        </p>
+                        <div className="flex gap-1.5 mt-1">
+                          <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono border ${
+                            leave.manager_approval === 'APPROVED' 
+                              ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
+                              : leave.manager_approval === 'REJECTED' 
+                              ? 'bg-rose-50 text-rose-700 border-rose-200' 
+                              : 'bg-amber-50 text-amber-700 border-amber-200'
+                          }`}>
+                            Mgr: {leave.manager_approval}
+                          </span>
+                          <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono border ${
+                            leave.admin_approval === 'APPROVED' 
+                              ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
+                              : leave.admin_approval === 'REJECTED' 
+                              ? 'bg-rose-50 text-rose-700 border-rose-200' 
+                              : 'bg-amber-50 text-amber-700 border-amber-200'
+                          }`}>
+                            HR: {leave.admin_approval}
+                          </span>
+                        </div>
                       </td>
                       <td className="px-6 py-4 text-right space-x-2">
                         {canAction && (

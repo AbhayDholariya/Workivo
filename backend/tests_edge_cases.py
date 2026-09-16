@@ -134,3 +134,45 @@ class EdgeCasesTestCase(TestCase):
         res = self.client.post(f'/api/leaves/{leave.id}/approve/')
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
         self.assertIn('cannot approve your own leave', str(res.data).lower())
+
+    def test_admin_cannot_apply_for_leave(self):
+        """HR / Admin users cannot submit leave requests."""
+        self.client.force_authenticate(user=self.admin)
+        today = timezone.localdate()
+        res = self.client.post('/api/leaves/', {
+            'leave_type': 'CASUAL',
+            'start_date': str(today + timedelta(days=5)),
+            'end_date': str(today + timedelta(days=6)),
+            'reason': 'Admin vacation'
+        })
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertIn('HR / Admin users cannot apply for leave', str(res.data))
+
+    def test_dual_approval_workflow(self):
+        """Employee leave requires both Manager and HR approval; Manager leave requires HR approval."""
+        today = timezone.localdate()
+        leave = LeaveRequest.objects.create(
+            user=self.emp1,
+            start_date=today + timedelta(days=30),
+            end_date=today + timedelta(days=31),
+            reason="Dual approval test leave"
+        )
+
+        # 1. Manager 1 approves
+        self.client.force_authenticate(user=self.manager1)
+        res1 = self.client.post(f'/api/leaves/{leave.id}/approve/')
+        self.assertEqual(res1.status_code, status.HTTP_200_OK)
+        leave.refresh_from_db()
+        self.assertEqual(leave.manager_approval, 'APPROVED')
+        self.assertEqual(leave.admin_approval, 'PENDING')
+        self.assertEqual(leave.status, 'PENDING') # Still pending HR approval
+
+        # 2. Admin approves
+        self.client.force_authenticate(user=self.admin)
+        res2 = self.client.post(f'/api/leaves/{leave.id}/approve/')
+        self.assertEqual(res2.status_code, status.HTTP_200_OK)
+        leave.refresh_from_db()
+        self.assertEqual(leave.admin_approval, 'APPROVED')
+        self.assertEqual(leave.status, 'APPROVED') # Now fully approved!
+
+

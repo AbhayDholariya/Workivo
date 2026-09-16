@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils import timezone
 
 class User(AbstractUser):
     class Role(models.TextChoices):
@@ -23,7 +24,7 @@ class User(AbstractUser):
         choices=EmploymentStatus.choices, 
         default=EmploymentStatus.ACTIVE
     )
-    joining_date = models.DateField(auto_now_add=True)
+    joining_date = models.DateField(default=timezone.now)
     
     # Manager hierarchy (Self-relation)
     manager = models.ForeignKey(

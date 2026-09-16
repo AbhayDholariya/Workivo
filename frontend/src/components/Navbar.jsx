@@ -45,7 +45,7 @@ export default function Navbar() {
             </div>
             <div>
               <span className="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
-                PulseHRMS
+                Workivo
               </span>
               <span className="hidden sm:inline-block ml-2 text-xs px-2 py-0.5 rounded bg-slate-100 text-slate-500 font-medium">
                 SaaS Portal
