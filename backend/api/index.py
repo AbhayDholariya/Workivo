@@ -1,9 +1,14 @@
 import os
 import sys
 
-# Add parent directory to python path for Django modules
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Set Django settings module for Vercel Serverless environment
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'hrms_core.settings')
 
-from hrms_core.wsgi import application
+# Add backend directory to python path
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if BASE_DIR not in sys.path:
+    sys.path.insert(0, BASE_DIR)
 
-app = application
+from django.core.wsgi import get_wsgi_application
+
+app = get_wsgi_application()
